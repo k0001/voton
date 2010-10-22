@@ -1,0 +1,28 @@
+form(id="search")
+
+  label(for="acta__year") Año:
+  select(id="acta__year", name="acta__year")
+    option(value="") ---
+    - each year in filters.acta__year
+      option(value="#{year}")= year
+
+  label(for="acta__periodo") Período:
+  select(id="acta__periodo", name="acta__periodo")
+    option(value="") ---
+    - each periodo in filters.acta__periodo
+      option(value="#{periodo}")= periodo
+
+  label(for="bloque") Bloque:
+  select(id="bloque", name="bloque")
+    option(value="") ---
+    - each bloque in filters.bloque
+      option(value="#{bloque}")= bloque
+
+  label(for="full_name") Nombre:
+  select(id="full_name", name="full_name")
+    option(value="") ---
+    - each full_name in filters.full_name
+      option(value="#{full_name}")= full_name
+
+  button(id="search")
+    | Search

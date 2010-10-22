@@ -1,0 +1,13 @@
+!!! 5
+
+html(lang="en")
+  title
+    - if (page_title != 'Vótonwerk')
+      | #{page_title} |
+    | Vótonwerk
+
+body
+  h1= page_title
+  #content!= body
+
+
