@@ -1,0 +1,20 @@
+#!/bin/bash
+
+PYTHON_BIN=`which python`
+MONGOLOADER="`dirname $0`/mongoload/votos.py"
+MONGOLOADER_BIN="$PYTHON_BIN $MONGOLOADER"
+
+trap "exit 1;" TERM INT
+
+for fname in "$@"; do
+    # expect filename to be in format 'votosYYYY.csv'
+
+    year=$(echo "$fname" | perl -pe 's,.*?/votos(\d{4}).csv,$1,')
+    if [ "$fname" == "$year" ]; then
+        echo "Filename $fname not in 'votosYYYY.csv' format"
+        exit 1
+    fi
+
+    echo "Mongoloading votos from $fname..."
+    $MONGOLOADER_BIN --csv-delimiter=";" --year="$year" "$fname"
+done
