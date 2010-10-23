@@ -51,20 +51,17 @@ app.get('/', function(req, res) {
     mongo_db.collection('votos', function(err, collection) {
         var filters = {}, locals = {};
         // WTF: WTF with all this nesting, DOOOD?! Need to read some more.
-        collection.distinct("acta.year", function(err, items) {
-            filters.acta__year = items;
-            collection.distinct("acta.periodo", function(err, items) {
-                filters.acta__periodo = items;
-                collection.distinct("full_name", function(err, items) {
-                    filters.full_name = items;
-                    collection.distinct("bloque", function(err, items) {
-                        filters.bloque = items;
-                        filters.acta__year = [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010];
-                        filters.acta__tipo = ['PT', 'ET', 'OT', 'OE', 'EE', 'OP'];
-                        locals.filters = filters
-                        locals.page_title = "Vótonwerk";
-                        res.render('index.jade', {'locals': locals});
-                    });
+        collection.distinct("acta.periodo", function(err, items) {
+            filters.acta__periodo = items;
+            collection.distinct("full_name", function(err, items) {
+                filters.full_name = items;
+                collection.distinct("bloque", function(err, items) {
+                    filters.bloque = items;
+                    filters.acta__year = [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010];
+                    filters.acta__tipo = ['PT', 'ET', 'OT', 'OE', 'EE', 'OP'];
+                    locals.filters = filters
+                    locals.page_title = "Vótonwerk";
+                    res.render('index.jade', {'locals': locals});
                 });
             });
         });
