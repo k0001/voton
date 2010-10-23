@@ -1,4 +1,5 @@
-var sys = require('sys');
+var sys = require('sys'),
+    util = require('./util');
 
 /**
  * Mongo */
@@ -24,14 +25,21 @@ var express = require('express'),
 
 app.configure(function() {
     app.use(express.logger());
+    app.use(express.gzip());
     app.set('view engine', 'jade');
 });
 
+app.helpers({
+    'STATIC_URL': '/static'
+});
+
 app.configure('development', function() {
+    app.use(express.staticProvider(__dirname + '/public'));
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function() {
+    app.use(express.cache());
     app.use(express.errorHandler());
 });
 
@@ -51,7 +59,8 @@ app.get('/', function(req, res) {
                     filters.full_name = items;
                     collection.distinct("bloque", function(err, items) {
                         filters.bloque = items;
-
+                        filters.acta__year = [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010];
+                        filters.acta__tipo = ['PT', 'ET', 'OT', 'OE', 'EE', 'OP'];
                         locals.filters = filters
                         locals.page_title = "Vótonwerk";
                         res.render('index.jade', {'locals': locals});
@@ -62,23 +71,57 @@ app.get('/', function(req, res) {
     });
 });
 
-app.get('/search', function(req, res) {
+app.get('/search.json', function(req, res) {
     mongo_db.collection('votos', function(err, collection) {
-        try {
-            q = JSON.parse(req.query['q'] || '{}');
-        } catch (e) {
-            res.send("your JSON writing sucks, dude.", 400);
-            return;
+        var mq = {};
+
+        if (req.query['acta__year']) {
+            x = Number(req.query['acta__year']);
+            if (isNaN(x)) {
+                res.send({
+                    "status": "ERROR",
+                    "info": "acta__year is not a numner"
+                }, 400);
+                return;
+            }
+            mq['acta.year'] = x;
         }
 
-        if (!('acta.year' in q) && !('acta.periodo' in q)) {
-            res.send("missing acta.year or acta.periodo on query!", 409);
-            return;
+        if (req.query['acta__periodo']) {
+            x = Number(req.query['acta__periodo']);
+            if (isNaN(x)) {
+                res.send({
+                    "status": "ERROR",
+                    "info": "acta__periodo is not a numner"
+                }, 400);
+                return;
+            }
+            mq['acta.periodo'] = x;
         }
 
-        collection.find(q, function(err, cursor) {
+        if (req.query['acta__tipo'])
+            mq['acta.tipo'] = req.query['acta__tipo'];
+        if (req.query['full_name'])
+            mq['full_name'] = req.query['full_name'];
+        if (req.query['bloque'])
+            mq['bloque'] = req.query['bloque'];
+
+        if (util.is_empty(mq)) {
+            res.send({
+                "status": "ERROR",
+                "info": "Specifying at least one search filter is required."
+            }, 409);
+            return;
+        }
+        collection.find(mq, function(err, cursor) {
             cursor.toArray(function(err, items) {
-                res.send(JSON.stringify(items));
+                res.send({
+                    "status": "OK",
+                    "info": items.length + " items found.",
+                    "payload": {
+                        "votes": items,
+                    }
+                });
             });
         });
 

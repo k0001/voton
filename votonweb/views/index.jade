@@ -1,28 +1,42 @@
-form(id="search")
+script(type="application/javascript", src=STATIC_URL + "/js/jquery-1.4.3.min.js")
+script(type="application/javascript", src=STATIC_URL + "/js/index.js")
 
-  label(for="acta__year") Año:
-  select(id="acta__year", name="acta__year")
-    option(value="") ---
-    - each year in filters.acta__year
-      option(value="#{year}")= year
+form(id="search", action="/search.json")
+  fieldset
+    h3 Votación
 
-  label(for="acta__periodo") Período:
-  select(id="acta__periodo", name="acta__periodo")
-    option(value="") ---
-    - each periodo in filters.acta__periodo
-      option(value="#{periodo}")= periodo
+    label(for="acta__year") Año:
+    select(id="acta__year", name="acta__year")
+      option(value="") ---
+      - each year in filters.acta__year
+        option(value=year)= year
 
-  label(for="bloque") Bloque:
-  select(id="bloque", name="bloque")
-    option(value="") ---
-    - each bloque in filters.bloque
-      option(value="#{bloque}")= bloque
+    label(for="acta__periodo") Período:
+    select(id="acta__periodo", name="acta__periodo")
+      option(value="") ---
+      - each periodo in filters.acta__periodo
+        option(value=periodo)= periodo
 
-  label(for="full_name") Nombre:
-  select(id="full_name", name="full_name")
-    option(value="") ---
-    - each full_name in filters.full_name
-      option(value="#{full_name}")= full_name
+    label(for="acta__tipo") Tipo de Sesión:
+    select(id="acta__tipo", name="acta__tipo")
+      option(value="") ---
+      - each tipo in filters.acta__tipo
+        option(value=tipo)= tipo
 
-  button(id="search")
+
+    h3 Votante
+
+    label(for="bloque") Bloque:
+    select(id="bloque", name="bloque")
+      option(value="") ---
+      - each bloque in filters.bloque
+        option(value=bloque)= bloque
+
+    label(for="full_name") Nombre:
+    select(id="full_name", name="full_name")
+      option(value="") ---
+      - each full_name in filters.full_name
+        option(value=full_name)= full_name
+
+  button(id="search", type="submit")
     | Search
